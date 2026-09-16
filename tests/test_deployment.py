@@ -11,11 +11,12 @@ def test_deployment_extracts_exist_and_safe():
     assert data_dir.exists(), "app/data directory must exist for deployment"
     
     expected_files = [
-        "mart_daily_kpis.parquet",
-        "mart_session_funnel.parquet",
+        "mart_product_kpis_daily.parquet",
+        "mart_funnel_performance.parquet",
         "mart_retention_cohorts.parquet",
-        "mart_rfm_segments.parquet",
-        "mart_session_monetization.parquet",
+        "mart_customer_rfm.parquet",
+        "mart_segment_performance.parquet",
+        "mart_product_performance.parquet",
         "metadata.json",
         "README.md"
     ]

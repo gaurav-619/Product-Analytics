@@ -17,11 +17,12 @@ BQ_LOCATION = os.getenv("BQ_LOCATION", "US")
 DATA_DIR = _project_root / "app" / "data"
 
 TABLES_TO_EXPORT = [
-    "mart_daily_kpis",
-    "mart_session_funnel",
+    "mart_product_kpis_daily",
+    "mart_funnel_performance",
     "mart_retention_cohorts",
-    "mart_rfm_segments",
-    "mart_session_monetization"
+    "mart_customer_rfm",
+    "mart_segment_performance",
+    "mart_product_performance"
 ]
 
 FORBIDDEN_COLS = {
@@ -61,6 +62,11 @@ def export_data():
             for col in df.select_dtypes(include=['object', 'string']).columns:
                 df[col] = df[col].replace(clean_map)
                 
+            # Cast 'dbdate' extension types to standard datetime64[ns]
+            for col in df.columns:
+                if str(df[col].dtype) == 'dbdate':
+                    df[col] = pd.to_datetime(df[col])
+                
             out_path = DATA_DIR / f"{table}.parquet"
             df.to_parquet(out_path, index=False)
             print(f"     Saved {len(df)} rows to {out_path.name}")
@@ -89,7 +95,7 @@ They are highly aggregated, non-sensitive extracts from the dbt models, allowing
     with open(DATA_DIR / "README.md", "w") as f:
         f.write(readme_content)
         
-    print("✅ Export complete!")
+    print("SUCCESS: Export complete!")
 
 if __name__ == "__main__":
     export_data()
