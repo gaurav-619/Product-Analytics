@@ -74,55 +74,68 @@ def _fqn(table: str) -> str:
 @st.cache_data(ttl=600)
 def load_mart(table_name: str) -> pd.DataFrame | None:
     """
-    Load a dbt mart table from BigQuery.
-
-    Returns None if the table doesn't exist or the query fails.
-    Uses Streamlit caching with a 10-minute TTL.
+    Load a dbt mart table based on the APP_DATA_MODE environment variable.
+    Defaults to 'static' deployment mode reading local .parquet files.
     """
-    # Deployment Mode: Try loading from static extract first
-    data_dir = Path(__file__).resolve().parent / "data"
-    parquet_path = data_dir / f"{table_name}.parquet"
+    app_mode = os.getenv("APP_DATA_MODE", "static").lower()
     
-    if parquet_path.exists():
-        try:
-            return pd.read_parquet(parquet_path)
-        except Exception as e:
-            st.error(f"❌ Failed to load local extract for `{table_name}`: {e}")
+    if app_mode == "static":
+        data_dir = Path(__file__).resolve().parent / "data"
+        parquet_path = data_dir / f"{table_name}.parquet"
+        
+        if parquet_path.exists():
+            try:
+                return pd.read_parquet(parquet_path)
+            except Exception as e:
+                st.error(f"❌ Failed to load local extract for `{table_name}`: {e}")
+                return None
+        else:
+            st.error(
+                f"❌ **Missing Static Data Extract: {table_name}.parquet**\n\n"
+                "You are running in 'static' mode but the data file is missing.\n"
+                "Run `python src/export_deployment_data.py` locally and push to GitHub."
+            )
             return None
 
-    # Local Development Fallback: Query BigQuery if extract not found
-    if not _check_config():
-        return None
+    # Local Development Mode (BigQuery)
+    elif app_mode == "bigquery":
+        if not _check_config():
+            return None
 
-    client = _get_client()
-    if client is None:
-        return None
+        client = _get_client()
+        if client is None:
+            return None
 
-    sql = f"SELECT * FROM {_fqn(table_name)}"
-    try:
-        df = client.query(sql).to_dataframe()
-        
-        # Clean up raw GA4 obfuscated values for better portfolio presentation
-        clean_map = {
-            "(none)": "Direct",
-            "(data deleted)": "Unknown",
-            "<Other>": "Other",
-            "(not set)": "Unknown",
-        }
-        for col in df.select_dtypes(include=['object', 'string']).columns:
-            df[col] = df[col].replace(clean_map)
+        sql = f"SELECT * FROM {_fqn(table_name)}"
+        try:
+            df = client.query(sql).to_dataframe()
             
-        return df
-    except Exception as e:
-        error_msg = str(e)
-        if "Not found" in error_msg:
-            st.warning(
-                f"⚠️ Table `{table_name}` not found in dataset `{BQ_DATASET}`. "
-                f"Run `dbt build` first, or generate deployment extracts."
-            )
-        else:
-            st.error(f"❌ Query failed for `{table_name}`: {e}")
+            # Clean up raw GA4 obfuscated values for better portfolio presentation
+            clean_map = {
+                "(none)": "Direct",
+                "(data deleted)": "Unknown",
+                "<Other>": "Other",
+                "(not set)": "Unknown",
+            }
+            for col in df.select_dtypes(include=['object', 'string']).columns:
+                df[col] = df[col].replace(clean_map)
+                
+            return df
+        except Exception as e:
+            error_msg = str(e)
+            if "Not found" in error_msg:
+                st.warning(
+                    f"⚠️ Table `{table_name}` not found in dataset `{BQ_DATASET}`. "
+                    f"Run `dbt build` first."
+                )
+            else:
+                st.error(f"❌ Query failed for `{table_name}`: {e}")
+            return None
+    else:
+        st.error(f"❌ Invalid APP_DATA_MODE: {app_mode}. Use 'static' or 'bigquery'.")
         return None
+
+
 
 
 def show_setup_instructions():
