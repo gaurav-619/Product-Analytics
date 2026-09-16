@@ -1,31 +1,11 @@
-# Core
-setuptools>=65.0
-pandas>=2.0,<3.0
+# Deployment Requirements
+# These are the minimal packages needed to run the Streamlit dashboard on Streamlit Community Cloud.
+# Local development and data modeling (dbt) dependencies are in requirements.dev.txt.
+
+pandas>=2.0
 numpy>=1.24
-
-# BigQuery
-google-cloud-bigquery>=3.11,<4.0
-google-cloud-bigquery-storage>=2.22,<3.0
-db-dtypes>=1.1,<2.0
-pyarrow>=12.0,<18.0
-
-# dbt
-dbt-core>=1.7,<2.0
-dbt-bigquery>=1.7,<2.0
-
-# Statistics
 scipy>=1.11
-statsmodels>=0.14,<1.0
-
-# Visualization
-plotly>=5.18,<6.0
-
-# Dashboard
-streamlit>=1.28,<2.0
-
-# Environment
-python-dotenv>=1.0,<2.0
-
-# Code quality
-ruff>=0.1.0
-pytest>=7.4,<9.0
+statsmodels>=0.14
+plotly>=5.18
+streamlit>=1.28
+pyarrow

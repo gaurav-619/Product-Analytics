@@ -1,0 +1,20 @@
+# Local Development & Data Modeling Requirements
+# Includes BigQuery, dbt, and testing tools for generating the data locally.
+
+-r requirements.txt
+
+# BigQuery
+google-cloud-bigquery>=3.11,<4.0
+google-cloud-bigquery-storage>=2.22,<3.0
+db-dtypes>=1.1,<2.0
+
+# dbt
+dbt-core>=1.7,<2.0
+dbt-bigquery>=1.7,<2.0
+
+# Environment
+python-dotenv>=1.0,<2.0
+
+# Code quality
+ruff>=0.1.0
+pytest>=7.4,<9.0
