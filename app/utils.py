@@ -35,10 +35,18 @@ BQ_LOCATION = os.getenv("BQ_LOCATION", "US")
 def _check_config() -> bool:
     """Verify required environment variables are set."""
     if not GCP_PROJECT_ID or not BQ_DATASET:
-        st.error(
-            "❌ Missing environment variables. "
-            "Copy `.env.example` to `.env` and set `GCP_PROJECT_ID` and `BQ_DATASET`."
-        )
+        if not HAS_BQ:
+            # We are on Streamlit Cloud and the parquet files are missing.
+            st.error(
+                "❌ **Missing Static Data Extracts**\n\n"
+                "To fix this, you must run `python src/export_deployment_data.py` on your local laptop, "
+                "then commit and push the generated `app/data/` files to GitHub."
+            )
+        else:
+            st.error(
+                "❌ Missing environment variables. "
+                "Copy `.env.example` to `.env` and set `GCP_PROJECT_ID` and `BQ_DATASET`."
+            )
         return False
     return True
 
