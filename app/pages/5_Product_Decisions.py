@@ -43,18 +43,18 @@ if kpi_df is None or seg_df is None:
     show_setup_instructions()
     st.stop()
 
-with st.expander("1. Simplify Mobile Checkout Flow (High Priority)", expanded=True):
+with st.expander("1. Reduce 'View to Cart' Friction (High Priority)", expanded=True):
     st.markdown("""
-    **Evidence:** Mobile users consistently convert at a lower rate than desktop users. The sequential funnel analysis shows a major bottleneck between the "Add to Cart" and "Purchase" steps.
+    **Evidence:** The sequential funnel analysis (`app/data/mart_funnel_performance.parquet`) shows that the largest absolute bottleneck is between "Product View" and "Add to Cart", with an ~80% drop-off rate across all devices.
     
-    **Hypothesis:** If we simplify the mobile checkout form by reducing required fields and adding fast-path payments (e.g., Apple Pay/Google Pay), then mobile conversion will increase because friction is reduced.
+    **Hypothesis:** If we redesign the product page to make the "Add to Cart" call-to-action sticky and prominent on mobile, then Add-to-Cart rates will increase because user scrolling friction is eliminated.
     
-    **Expected Impact:** +0.5% to +1.5% absolute lift in mobile conversion.
-    *Assumptions:* Based on industry benchmarks for accelerated checkout adoption. Requires MDE validation.
+    **Expected Impact:** +1.0% to +2.5% relative lift in Add-to-Cart rate.
+    *Assumptions:* Based on industry benchmarks for sticky CTA implementation. Requires MDE validation.
     
     **Risks:** 
-    - Payment error rates might spike if validation logic is weakened.
-    - Potential for increased refund requests if fast-checkout causes accidental purchases.
+    - The sticky CTA might obscure critical product details or reviews, ironically lowering intent.
+    - Potential for increased cart abandonment if users add items accidentally while scrolling.
     
     **Measurement Plan:** A/B Test (See Proposal below).
     """)
@@ -94,7 +94,7 @@ st.markdown("---")
 
 # ── Experiment Proposal ──────────────────────────────────────────────────
 
-st.subheader("Experiment Proposal: Mobile Checkout Simplification")
+st.subheader("Experiment Proposal: Sticky 'Add to Cart' CTA")
 
 st.markdown(
     """
