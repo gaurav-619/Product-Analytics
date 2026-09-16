@@ -327,17 +327,7 @@ product-analytics-engine/
 └── tests/
 ```
 
----
 
-## Interview Talking Points
-
-1. **"Walk me through this project."** → See [`docs/interview_guide.md`](docs/interview_guide.md)
-2. **"Why this dataset?"** → Real production data from a recognizable brand, publicly available, complex nested schema.
-3. **"How do you handle data quality?"** → Multi-layer: dbt tests, Python quality scripts, dashboard empty-state handling.
-4. **"What would you do differently with more data?"** → Cross-device identity, longer retention windows, actual A/B tests, qualitative research.
-5. **"How does this apply to gaming?"** → See [`docs/gaming_translation.md`](docs/gaming_translation.md)
-
----
 
 ## License
 
