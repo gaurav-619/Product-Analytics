@@ -11,12 +11,20 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
-from dotenv import load_dotenv
-from google.cloud import bigquery
 
-# Load .env from project root
-_project_root = Path(__file__).resolve().parent.parent
-load_dotenv(_project_root / ".env")
+# Optional dependencies for local development
+try:
+    from dotenv import load_dotenv
+    _project_root = Path(__file__).resolve().parent.parent
+    load_dotenv(_project_root / ".env")
+except ImportError:
+    pass
+
+try:
+    from google.cloud import bigquery
+    HAS_BQ = True
+except ImportError:
+    HAS_BQ = False
 
 # Configuration
 GCP_PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
@@ -36,9 +44,9 @@ def _check_config() -> bool:
 
 
 @st.cache_resource
-def _get_client() -> bigquery.Client | None:
+def _get_client() -> "bigquery.Client | None":
     """Return a cached BigQuery client."""
-    if not GCP_PROJECT_ID:
+    if not HAS_BQ or not GCP_PROJECT_ID:
         return None
     try:
         return bigquery.Client(project=GCP_PROJECT_ID, location=BQ_LOCATION)
