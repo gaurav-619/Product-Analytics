@@ -1,0 +1,13 @@
+{
+  "export_timestamp_utc": "2026-09-16T22:06:12.343761+00:00",
+  "source_dataset": "project-342825ab-5da5-4a96-bb2.product_analytics",
+  "dataset_disclosure": "SIMULATED EXPERIMENT DATA \u2014 Educational demonstration only. This is not GA4 data and is not evidence of real business impact. Base observational data is Google's public, obfuscated GA4 Google Merchandise Store sample.",
+  "tables_exported": [
+    "mart_product_kpis_daily",
+    "mart_funnel_performance",
+    "mart_retention_cohorts",
+    "mart_customer_rfm",
+    "mart_segment_performance",
+    "mart_product_performance"
+  ]
+}
