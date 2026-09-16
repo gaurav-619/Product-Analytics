@@ -1,0 +1,16 @@
+{
+    "experiment_name": "mobile_checkout_simplification_v1",
+    "seed": 42,
+    "population_size": 25000,
+    "assumptions": {
+        "allocation": "50/50 random assignment",
+        "control_conversion_rate": 0.05,
+        "treatment_conversion_rate": 0.057,
+        "revenue_distribution": "lognormal(mu=3.8, sigma=0.8) for converters only",
+        "control_payment_error_rate": 0.01,
+        "treatment_payment_error_rate": 0.012,
+        "control_checkout_duration_mean_sec": 120,
+        "treatment_checkout_duration_mean_sec": 100
+    },
+    "disclaimer": "# SIMULATED EXPERIMENT DATA - Educational demonstration of experimentation analysis. This is not GA4 data and is not evidence of real business impact."
+}

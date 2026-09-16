@@ -1,0 +1,33 @@
+version: 2
+
+sources:
+  - name: ga4
+    description: >
+      Google's public, obfuscated GA4 Google Merchandise Store sample ecommerce dataset.
+      Contains daily event export tables with nested event parameters, items, device,
+      geo, and traffic source fields. Each table represents one day of events.
+      
+      Source: bigquery-public-data.ga4_obfuscated_sample_ecommerce.events_*
+      
+      This is real production data from the Google Merchandise Store with anonymized
+      user identifiers. It is NOT proprietary data and is freely available for analysis.
+    database: bigquery-public-data
+    schema: ga4_obfuscated_sample_ecommerce
+    tables:
+      - name: events
+        identifier: "events_*"
+        description: >
+          Wildcard table covering daily GA4 event exports. Each row is one event
+          (page_view, view_item, add_to_cart, begin_checkout, purchase, etc.).
+          Use _TABLE_SUFFIX to filter by date in YYYYMMDD format.
+        columns:
+          - name: event_date
+            description: "Date of the event in YYYYMMDD string format"
+          - name: event_timestamp
+            description: "Event timestamp in microseconds since Unix epoch (UTC)"
+          - name: event_name
+            description: "Name of the event (e.g., page_view, purchase, add_to_cart)"
+          - name: user_pseudo_id
+            description: "Anonymized user identifier (hashed client ID)"
+          - name: event_params
+            description: "Repeated record of key-value event parameters"

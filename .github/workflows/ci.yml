@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-parse:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint with ruff
+        run: ruff check src/ app/ tests/
+
+      - name: Run Python tests
+        run: python -m pytest tests/ -v
+
+      - name: dbt deps
+        working-directory: dbt_product_analytics
+        run: dbt deps
+
+      # dbt parse validates SQL syntax and ref/source resolution without
+      # requiring a live BigQuery connection. This is the safest CI check
+      # that does not need GCP credentials.
+      - name: dbt parse (syntax validation)
+        working-directory: dbt_product_analytics
+        env:
+          # dbt parse needs a profiles.yml but won't connect.
+          # We create a minimal one to satisfy the parser.
+          DBT_PROFILES_DIR: .
+        run: |
+          cat > profiles.yml << 'EOF'
+          product_analytics_engine:
+            target: ci
+            outputs:
+              ci:
+                type: bigquery
+                method: oauth
+                project: ci-placeholder
+                dataset: ci_placeholder
+                location: US
+                threads: 1
+          EOF
+          dbt parse

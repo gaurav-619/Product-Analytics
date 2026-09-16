@@ -1,0 +1,119 @@
+version: 2
+
+models:
+  # --- Intermediate Models ---
+  - name: int_sessions
+    description: "Session-level aggregation. Grain: one row per session_key."
+    columns:
+      - name: session_key
+        description: "Composite session identifier (user_pseudo_id + ga_session_id)"
+        tests:
+          - unique
+          - not_null
+      - name: user_pseudo_id
+        tests:
+          - not_null
+      - name: session_date
+        tests:
+          - not_null
+
+  - name: int_users
+    description: "User-level aggregation. Grain: one row per user_pseudo_id."
+    columns:
+      - name: user_pseudo_id
+        description: "Anonymized user identifier"
+        tests:
+          - unique
+          - not_null
+      - name: first_seen_date
+        tests:
+          - not_null
+
+  - name: int_orders
+    description: "Deduplicated transaction-level model. Grain: one row per order_transaction_key."
+    columns:
+      - name: order_transaction_key
+        description: "Canonical transaction identifier"
+        tests:
+          - unique
+          - not_null
+      - name: user_pseudo_id
+        tests:
+          - not_null
+      - name: order_revenue_usd
+        description: "Order revenue in USD. Must be non-negative (tested)."
+
+  - name: int_session_funnel
+    description: "Strict sequential funnel per session. Grain: one row per session_key."
+    columns:
+      - name: session_key
+        tests:
+          - unique
+          - not_null
+
+  - name: int_product_events
+    description: "Unnested item-level events. Grain: one row per event-item pair."
+
+  # --- Mart Models ---
+  - name: mart_product_kpis_daily
+    description: "Daily product KPIs. Grain: one row per report_date."
+    columns:
+      - name: report_date
+        tests:
+          - unique
+          - not_null
+
+  - name: mart_funnel_performance
+    description: "Sequential funnel by date and device. Grain: one row per (report_date, device_category)."
+    columns:
+      - name: report_date
+        tests:
+          - not_null
+
+  - name: mart_retention_cohorts
+    description: "Weekly activity retention cohorts. Grain: one row per (cohort_week, activity_week_index)."
+    columns:
+      - name: cohort_week
+        tests:
+          - not_null
+      - name: cohort_size
+        description: "Number of users in the cohort"
+
+  - name: mart_customer_rfm
+    description: "Purchaser-level RFM segmentation. Grain: one row per user_pseudo_id."
+    columns:
+      - name: user_pseudo_id
+        tests:
+          - unique
+          - not_null
+      - name: rfm_segment
+        tests:
+          - accepted_values:
+              values:
+                - 'Champions'
+                - 'Loyal Customers'
+                - 'Potential Loyalists'
+                - 'Recent Customers'
+                - 'At Risk'
+                - 'Occasional Customers'
+
+  - name: mart_segment_performance
+    description: "Performance by segment type. Grain: one row per (segment_type, segment_value)."
+    columns:
+      - name: segment_type
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'device_category'
+                - 'acquisition_medium'
+                - 'search_adoption'
+                - 'purchaser_status'
+
+  - name: mart_product_performance
+    description: "Item-level purchase metrics. Grain: one row per item_id."
+    columns:
+      - name: item_id
+        tests:
+          - unique
+          - not_null

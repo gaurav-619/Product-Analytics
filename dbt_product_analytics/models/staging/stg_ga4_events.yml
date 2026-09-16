@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: stg_ga4_events
+    description: >
+      Flattened GA4 event-level staging model. One row per event from the Google
+      Merchandise Store public dataset. Extracts nested event parameters, device,
+      geo, and traffic source fields into typed columns.
+    columns:
+      - name: event_timestamp
+        description: "Event timestamp in microseconds (original)"
+      - name: event_timestamp_utc
+        description: "Event timestamp as UTC TIMESTAMP"
+      - name: event_date_parsed
+        description: "Event date as DATE type"
+      - name: event_name
+        description: "GA4 event name (page_view, view_item, add_to_cart, begin_checkout, purchase, etc.)"
+      - name: user_pseudo_id
+        description: "Anonymized user identifier"
+        tests:
+          - not_null
+      - name: session_key
+        description: "Composite key: user_pseudo_id + ga_session_id. NULL if session ID is missing."
+      - name: ga_session_id
+        description: "GA4 session identifier extracted from event_params"
+      - name: page_location
+        description: "Full URL of the page where the event fired"
+      - name: search_term
+        description: "Search query entered by user (populated on view_search_results events)"
+      - name: transaction_id
+        description: "Transaction ID from event_params"
+      - name: ecommerce_transaction_id
+        description: "Transaction ID from ecommerce struct"
+      - name: ecommerce_purchase_revenue
+        description: "Purchase revenue from ecommerce struct"
+      - name: ecommerce_purchase_revenue_in_usd
+        description: "Purchase revenue in USD from ecommerce struct"
+      - name: device_category
+        description: "Device category: desktop, mobile, tablet"
+      - name: country
+        description: "User's country"
+      - name: first_user_source
+        description: "First-touch traffic source"
+      - name: first_user_medium
+        description: "First-touch traffic medium"
